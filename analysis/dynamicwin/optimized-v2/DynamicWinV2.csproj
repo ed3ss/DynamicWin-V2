@@ -1,0 +1,71 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <AssemblyName>DynamicWinV2</AssemblyName>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <OutputType>WinExe</OutputType>
+    <UseWindowsForms>True</UseWindowsForms>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>preview</LangVersion><Nullable>enable</Nullable><GenerateTargetPlatformAttribute>false</GenerateTargetPlatformAttribute><GenerateSupportedOSPlatformAttribute>false</GenerateSupportedOSPlatformAttribute>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <RootNamespace />
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="DynamicWinV2.resources.manifest.DWV2LogoAnimOut.webm" />
+    <EmbeddedResource Include="DynamicWinV2.resources.manifest.DWV2LogoAnimOut.webm" LogicalName="DynamicWinV2.resources.manifest.DWV2LogoAnimOut.webm" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="SkiaSharp">
+      <HintPath>../v2.0.3/SkiaSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Vortice.DXGI">
+      <HintPath>../v2.0.3/Vortice.DXGI.dll</HintPath>
+    </Reference>
+    <Reference Include="Vortice.Direct3D11">
+      <HintPath>../v2.0.3/Vortice.Direct3D11.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpGen.Runtime">
+      <HintPath>../v2.0.3/SharpGen.Runtime.dll</HintPath>
+    </Reference>
+    <ProjectReference Include="../optimized-fenui/fenUI.csproj" />
+    <Reference Include="FFMediaToolkit">
+      <HintPath>../v2.0.3/FFMediaToolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="NAudio.Wasapi">
+      <HintPath>../v2.0.3/NAudio.Wasapi.dll</HintPath>
+    </Reference>
+    <Reference Include="NAudio.Core">
+      <HintPath>../v2.0.3/NAudio.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis">
+      <HintPath>../v2.0.3/Google.Apis.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis.Auth">
+      <HintPath>../v2.0.3/Google.Apis.Auth.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis.Calendar.v3">
+      <HintPath>../v2.0.3/Google.Apis.Calendar.v3.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.SDK.NET">
+      <HintPath>../v2.0.3/Microsoft.Windows.SDK.NET.dll</HintPath>
+    </Reference>
+    <Reference Include="Vortice.DirectX">
+      <HintPath>../v2.0.3/Vortice.DirectX.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis.Core">
+      <HintPath>../v2.0.3/Google.Apis.Core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+<ItemGroup><Reference Include="WinRT.Runtime"><HintPath>../v2.0.3/WinRT.Runtime.dll</HintPath></Reference></ItemGroup>
+<ItemGroup>
+  <PackageReference Include="DiscordRichPresence" Version="1.6.1.70" />
+  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  <None Update="Licenses/DiscordRichPresence.txt" CopyToOutputDirectory="PreserveNewest" />
+</ItemGroup>
+</Project>
+

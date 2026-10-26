@@ -1,0 +1,13 @@
+.tools/
+**/bin/
+**/obj/
+dist/
+analysis/dynamicwin/v2.0.3/
+*.zip
+*.log
+.env*
+**/settings.json
+**/gcalendar/
+**/*computer_id*
+**/*credentials*.json
+**/*token*.json

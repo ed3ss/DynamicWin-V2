@@ -1,0 +1,78 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>fenUI</AssemblyName>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <TargetFramework>net9.0-windows</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>preview</LangVersion><Nullable>enable</Nullable><GenerateTargetPlatformAttribute>false</GenerateTargetPlatformAttribute><GenerateSupportedOSPlatformAttribute>false</GenerateSupportedOSPlatformAttribute>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace />
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="fenUI.images.check.png" />
+    <None Remove="fenUI.images.chevron-left.png" />
+    <None Remove="fenUI.images.chevron-right.png" />
+    <None Remove="fenUI.images.clipboard.png" />
+    <None Remove="fenUI.images.copy.png" />
+    <None Remove="fenUI.images.default.png" />
+    <None Remove="fenUI.images.fenui-logo-error.png" />
+    <None Remove="fenUI.images.fenui-logo.png" />
+    <None Remove="fenUI.images.test_img.jpg" />
+    <None Remove="fenUI.icons.fenui-logo-error.ico" />
+    <None Remove="fenUI.icons.fenui.ico" />
+    <None Remove="fenUI.icons.TrayIcon.ico" />
+    <None Remove="fenUI.lib.fenUICrashHandler.dll" />
+    <None Remove="fenUI.lib.fenUICrashHandler.exe" />
+    <None Remove="fenUI.lib.fenUICrashHandler.runtimeconfig.json" />
+    <EmbeddedResource Include="fenUI.images.check.png" LogicalName="fenUI.images.check.png" />
+    <EmbeddedResource Include="fenUI.images.chevron-left.png" LogicalName="fenUI.images.chevron-left.png" />
+    <EmbeddedResource Include="fenUI.images.chevron-right.png" LogicalName="fenUI.images.chevron-right.png" />
+    <EmbeddedResource Include="fenUI.images.clipboard.png" LogicalName="fenUI.images.clipboard.png" />
+    <EmbeddedResource Include="fenUI.images.copy.png" LogicalName="fenUI.images.copy.png" />
+    <EmbeddedResource Include="fenUI.images.default.png" LogicalName="fenUI.images.default.png" />
+    <EmbeddedResource Include="fenUI.images.fenui-logo-error.png" LogicalName="fenUI.images.fenui-logo-error.png" />
+    <EmbeddedResource Include="fenUI.images.fenui-logo.png" LogicalName="fenUI.images.fenui-logo.png" />
+    <EmbeddedResource Include="fenUI.images.test_img.jpg" LogicalName="fenUI.images.test_img.jpg" />
+    <EmbeddedResource Include="fenUI.icons.fenui-logo-error.ico" LogicalName="fenUI.icons.fenui-logo-error.ico" />
+    <EmbeddedResource Include="fenUI.icons.fenui.ico" LogicalName="fenUI.icons.fenui.ico" />
+    <EmbeddedResource Include="fenUI.icons.TrayIcon.ico" LogicalName="fenUI.icons.TrayIcon.ico" />
+    <EmbeddedResource Include="fenUI.lib.fenUICrashHandler.dll" LogicalName="fenUI.lib.fenUICrashHandler.dll" />
+    <EmbeddedResource Include="fenUI.lib.fenUICrashHandler.exe" LogicalName="fenUI.lib.fenUICrashHandler.exe" />
+    <EmbeddedResource Include="fenUI.lib.fenUICrashHandler.runtimeconfig.json" LogicalName="fenUI.lib.fenUICrashHandler.runtimeconfig.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Vortice.DirectX">
+      <HintPath>../v2.0.3/Vortice.DirectX.dll</HintPath>
+    </Reference>
+    <Reference Include="Vortice.DXGI">
+      <HintPath>../v2.0.3/Vortice.DXGI.dll</HintPath>
+    </Reference>
+    <Reference Include="Vortice.Direct3D12">
+      <HintPath>../v2.0.3/Vortice.Direct3D12.dll</HintPath>
+    </Reference>
+    <Reference Include="Vortice.DirectComposition">
+      <HintPath>../v2.0.3/Vortice.DirectComposition.dll</HintPath>
+    </Reference>
+    <Reference Include="Vortice.Direct3D11">
+      <HintPath>../v2.0.3/Vortice.Direct3D11.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpGen.Runtime">
+      <HintPath>../v2.0.3/SharpGen.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="SkiaSharp">
+      <HintPath>../v2.0.3/SkiaSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Toolkit.Uwp.Notifications">
+      <HintPath>../v2.0.3/Microsoft.Toolkit.Uwp.Notifications.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.SDK.NET">
+      <HintPath>../v2.0.3/Microsoft.Windows.SDK.NET.dll</HintPath>
+    </Reference>
+    <Reference Include="Vortice.Mathematics">
+      <HintPath>../v2.0.3/Vortice.Mathematics.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+<ItemGroup><Reference Include="WinRT.Runtime"><HintPath>../v2.0.3/WinRT.Runtime.dll</HintPath></Reference></ItemGroup></Project>

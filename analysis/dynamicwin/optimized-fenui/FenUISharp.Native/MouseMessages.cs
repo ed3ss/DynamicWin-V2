@@ -1,0 +1,11 @@
+namespace FenUISharp.Native;
+
+public enum MouseMessages
+{
+	WM_LBUTTONDOWN = 513,
+	WM_LBUTTONUP = 514,
+	WM_RBUTTONDOWN = 516,
+	WM_RBUTTONUP = 517,
+	WM_MBUTTONDOWN = 519,
+	WM_MBUTTONUP = 520
+}

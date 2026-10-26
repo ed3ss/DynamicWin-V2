@@ -1,0 +1,26 @@
+namespace FenUISharp.Native;
+
+public static class HitTest
+{
+	public const int HTNOWHERE = 0;
+
+	public const int HTLEFT = 10;
+
+	public const int HTRIGHT = 11;
+
+	public const int HTTOP = 12;
+
+	public const int HTTOPLEFT = 13;
+
+	public const int HTTOPRIGHT = 14;
+
+	public const int HTBOTTOM = 15;
+
+	public const int HTBOTTOMLEFT = 16;
+
+	public const int HTBOTTOMRIGHT = 17;
+
+	public const int HTCLIENT = 1;
+
+	public const int HTTRANSPARENT = -1;
+}

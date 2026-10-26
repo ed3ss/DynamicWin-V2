@@ -1,0 +1,30 @@
+using System;
+using FenUISharp.Mathematics;
+using FenUISharp.Native;
+using SkiaSharp;
+
+namespace FenUISharp;
+
+public class FTransparentWindow : FWindow
+{
+	public FTransparentWindow(string title, string className, Vector2? position, Vector2? size)
+		: base(title, className, position, size)
+	{
+		base.Properties.AllowResize = false;
+	}
+
+	protected override nint CreateWindow(WNDCLASSEX wndClass, Vector2 position, Vector2 size)
+	{
+		if (position == new Vector2(-1f, -1f))
+		{
+			RECT monitorRect = Win32APIs.GetMonitorRect(0);
+			position = new Vector2((float)((monitorRect.right - monitorRect.left) / 2) - size.x / 2f, (float)((monitorRect.bottom - monitorRect.top) / 2) - size.y / 2f);
+		}
+		return Win32APIs.CreateWindowExA(2097152, base.WindowClass, base.WindowTitle, int.MinValue, (int)position.x, (int)position.y, (int)size.x, (int)size.y, IntPtr.Zero, IntPtr.Zero, wndClass.hInstance, IntPtr.Zero);
+	}
+
+	internal override void ClearSurface(SKCanvas canvas)
+	{
+		canvas.Clear(SKColors.Transparent);
+	}
+}
