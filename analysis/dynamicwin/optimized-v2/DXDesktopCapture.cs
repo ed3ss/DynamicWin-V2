@@ -22,7 +22,8 @@ public class DXDesktopCapture : IDisposable
 
 	private readonly Thread _loopThread;
 
-	private bool _running;
+	private volatile bool _running;
+	private bool _disposed;
 
 	public event Action<SKImage> FrameReady;
 
@@ -46,18 +47,18 @@ public class DXDesktopCapture : IDisposable
 			nint currentMonitorHandle = FContext.GetCurrentWindow().Shape.CurrentMonitorHandle;
 			IDXGIOutput iDXGIOutput = null;
 			IDXGIOutput outputOut;
-			while (!iDXGIAdapter.EnumOutputs(0u, out outputOut).Failure)
+			for (uint index = 0; !iDXGIAdapter.EnumOutputs(index, out outputOut).Failure; index++)
 			{
 				if (outputOut.Description.Monitor == currentMonitorHandle)
 				{
 					iDXGIOutput = outputOut;
 					break;
 				}
+				outputOut.Dispose();
 			}
 			if (iDXGIOutput == null)
 			{
-				Dispose();
-				return;
+				throw new InvalidOperationException("Desktop capture is unavailable for this monitor.");
 			}
 			using IDXGIOutput1 iDXGIOutput2 = iDXGIOutput.QueryInterface<IDXGIOutput1>();
 			_duplication = iDXGIOutput2.DuplicateOutput(_d3dDevice);
@@ -80,13 +81,17 @@ public class DXDesktopCapture : IDisposable
 		}
 		catch (Exception)
 		{
+			_duplication?.Dispose();
+			_stagingTexture?.Dispose();
+			_d3dContext?.Dispose();
+			_d3dDevice?.Dispose();
 			throw;
 		}
 	}
 
 	public void Start()
 	{
-		if (!_running)
+		if (!_disposed && !_running && _loopThread.ThreadState.HasFlag(ThreadState.Unstarted))
 		{
 			_running = true;
 			_loopThread.Start();
@@ -96,7 +101,7 @@ public class DXDesktopCapture : IDisposable
 	public void Stop()
 	{
 		_running = false;
-		_loopThread.Join();
+		if (_loopThread != null && _loopThread.IsAlive && Thread.CurrentThread != _loopThread) _loopThread.Join();
 	}
 
 	private void EnsureStaging(int width, int height)
@@ -147,21 +152,19 @@ public class DXDesktopCapture : IDisposable
 				}
 				try
 				{
-					ID3D11Texture2D iD3D11Texture2D = desktopResource.QueryInterfaceOrNull<ID3D11Texture2D>();
+					using ID3D11Texture2D iD3D11Texture2D = desktopResource.QueryInterfaceOrNull<ID3D11Texture2D>();
 					if (iD3D11Texture2D == null)
 					{
-						_duplication.ReleaseFrame();
 						continue;
 					}
 					Texture2DDescription description = iD3D11Texture2D.Description;
 					EnsureStaging((int)description.Width, (int)description.Height);
 					_d3dContext.CopyResource(_stagingTexture, iD3D11Texture2D);
-					MappedSubresource mappedSubresource = _d3dContext.Map(_stagingTexture, 0u);
 					if (frameInfo.LastPresentTime == 0L)
 					{
-						_duplication.ReleaseFrame();
 						continue;
 					}
+					MappedSubresource mappedSubresource = _d3dContext.Map(_stagingTexture, 0u);
 					try
 					{
 						nint dataPointer = mappedSubresource.DataPointer;
@@ -170,11 +173,9 @@ public class DXDesktopCapture : IDisposable
 						int height = (int)description.Height;
 						using SKBitmap sKBitmap = new SKBitmap(new SKImageInfo(width, height, SKColorType.Bgra8888, SKAlphaType.Premul));
 						nint pixels = sKBitmap.GetPixels();
-						int num = rowPitch * height;
-						byte[] array = new byte[num];
-						Marshal.Copy(dataPointer, array, 0, num);
-						Marshal.Copy(array, 0, pixels, num);
-						this.FrameReady?.Invoke(SKImage.FromBitmap(sKBitmap));
+						PixelRowCopy.Copy(dataPointer, rowPitch, pixels, sKBitmap.RowBytes, width, height);
+						var handler = FrameReady;
+						if (handler != null) handler(SKImage.FromBitmap(sKBitmap));
 					}
 					finally
 					{
@@ -197,10 +198,13 @@ public class DXDesktopCapture : IDisposable
 
 	public void Dispose()
 	{
+		if (_disposed) return;
+		_disposed = true;
 		Stop();
+		_duplication?.Dispose();
 		_stagingTexture?.Dispose();
 		_gpuTexture?.Dispose();
-		_d3dDevice.Dispose();
 		_d3dContext.Dispose();
+		_d3dDevice.Dispose();
 	}
 }

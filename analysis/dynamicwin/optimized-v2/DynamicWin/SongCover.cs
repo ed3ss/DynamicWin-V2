@@ -27,6 +27,7 @@ public class SongCover : FImage
 	private bool _isSongFavorite;
 
 	private Dispatcher? dispatcher;
+	private bool disposed;
 
 	private (SKColor, SKColor) cachedPrimaries = (FContext.GetCurrentWindow().WindowThemeManager.CurrentTheme.Primary, SKColors.White);
 
@@ -175,14 +176,15 @@ public class SongCover : FImage
 				}
 			}
 		};
-		FContext.GetCurrentWindow()?.WindowKeyboardInput?.RegisterKeybind(play);
+		var keyboard = FContext.GetCurrentWindow().WindowKeyboardInput;
+		keyboard?.RegisterKeybind(play);
 		FContext.GetCurrentWindow()?.WindowKeyboardInput?.RegisterKeybind(skipFwd);
 		FContext.GetCurrentWindow()?.WindowKeyboardInput?.RegisterKeybind(skipRwd);
 		base.OnObjectDisposed = (Action)Delegate.Combine(base.OnObjectDisposed, (Action)delegate
 		{
-			FContext.GetCurrentWindow()?.WindowKeyboardInput?.UnregisterKeybind(play);
-			FContext.GetCurrentWindow()?.WindowKeyboardInput?.UnregisterKeybind(skipFwd);
-			FContext.GetCurrentWindow()?.WindowKeyboardInput?.UnregisterKeybind(skipRwd);
+			keyboard?.UnregisterKeybind(play);
+			keyboard?.UnregisterKeybind(skipFwd);
+			keyboard?.UnregisterKeybind(skipRwd);
 		});
 		_isSongFavorite = MusicFavoritesView.IsSongInFavorites(WindowsMediaControls.CachedInfo.title, WindowsMediaControls.CachedInfo.artist);
 		UpdateIsFavorite();
@@ -242,11 +244,17 @@ public class SongCover : FImage
 
 	public override void Dispose()
 	{
+		disposed = true;
 		WindowsMediaControls.onThumbnailUpdated = (Action)Delegate.Remove(WindowsMediaControls.onThumbnailUpdated, new Action(OnThumbnailUpdate));
 		base.Dispose();
 	}
 
 	private void OnThumbnailUpdate()
+	{
+		dispatcher?.Invoke(() => { if (!disposed) ApplyThumbnailUpdate(); });
+	}
+
+	private void ApplyThumbnailUpdate()
 	{
 		coverAnimator.Restart();
 		_isSongFavorite = MusicFavoritesView.IsSongInFavorites(WindowsMediaControls.CachedInfo.title, WindowsMediaControls.CachedInfo.artist);
@@ -265,8 +273,10 @@ public class SongCover : FImage
 		{
 			return cachedPrimaries;
 		}
-		using SKImage image = SKImage.FromBitmap(SKBitmap.FromImage(WindowsMediaControls.CachedInfo.thumbnail).Resize(new SKImageInfo(downscaleSize, downscaleSize), new SKSamplingOptions(SKFilterMode.Nearest, SKMipmapMode.Nearest)));
-		SKBitmap sKBitmap = SKBitmap.FromImage(image);
+		using SKBitmap original = SKBitmap.FromImage(WindowsMediaControls.CachedInfo.thumbnail);
+		if (original == null) return cachedPrimaries;
+		using SKBitmap sKBitmap = original.Resize(new SKImageInfo(downscaleSize, downscaleSize), new SKSamplingOptions(SKFilterMode.Nearest, SKMipmapMode.Nearest));
+		if (sKBitmap == null) return cachedPrimaries;
 		Dictionary<SKColor, float> dictionary = new Dictionary<SKColor, float>();
 		for (int i = 0; i < sKBitmap.Height; i++)
 		{

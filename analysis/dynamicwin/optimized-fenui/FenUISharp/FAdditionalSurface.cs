@@ -44,6 +44,13 @@ public class FAdditionalSurface : IDisposable
 		Texture = fAdditionalSurface.Texture;
 		ResourceInfo = fAdditionalSurface.ResourceInfo;
 		BackendTexture = fAdditionalSurface.BackendTexture;
+		// Transfer ownership; the temporary wrapper must not dispose these handles later.
+		SkiaDirectCompositionContext.OnRebuildAdditionals -= fAdditionalSurface.RebuildSurface;
+		SkiaDirectCompositionContext.OnDisposeAdditionals -= fAdditionalSurface.Dispose;
+		fAdditionalSurface.SkiaSurface = null;
+		fAdditionalSurface.Texture = null;
+		fAdditionalSurface.ResourceInfo = null;
+		fAdditionalSurface.BackendTexture = null;
 	}
 
 	public void Dispose()

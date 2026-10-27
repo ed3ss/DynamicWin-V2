@@ -127,13 +127,14 @@ public class CachedSurface(Action<SKCanvas?> DrawAction) : IDisposable
 		{
 			if (_cachedSurface != null)
 			{
-				_cachedSurface?.SkiaSurface?.Canvas.Dispose();
+				_cachedSnapshot?.Dispose();
+				_cachedSnapshot = null;
 				_cachedSurface?.Dispose();
 				_cachedSurface = null;
 			}
 			quality = RMath.Clamp(quality, 0f, 1f);
-			int width = (int)((dimensions.Width + (float)(padding * 2)) * quality);
-			int height = (int)((dimensions.Height + (float)(padding * 2)) * quality);
+			int width = Math.Max(1, (int)((dimensions.Width + (float)(padding * 2)) * quality));
+			int height = Math.Max(1, (int)((dimensions.Height + (float)(padding * 2)) * quality));
 			this.padding = padding;
 			this.quality = quality;
 			_cachedImageInfo = new SKImageInfo(width, height);

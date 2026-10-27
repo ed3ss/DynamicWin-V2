@@ -22,6 +22,7 @@ public class WindowsMediaControls
 	private static bool continousPolling = true;
 
 	private static SKImage? lastThumbnail;
+	private static readonly SemaphoreSlim thumbnailGate = new(1, 1);
 
 	private const int THUMBNAIL_SIZE = 512;
 
@@ -94,6 +95,7 @@ public class WindowsMediaControls
 						}
 						catch (Exception)
 						{
+							Thread.Sleep(500);
 							continue;
 						}
 					}
@@ -182,11 +184,7 @@ public class WindowsMediaControls
 					{
 						try
 						{
-							UpdateThumbnailAsync();
-							Thread.Sleep(1000);
-							UpdateThumbnailAsync();
-							Thread.Sleep(1000);
-							UpdateThumbnailAsync();
+							await UpdateThumbnailAsync();
 							return;
 						}
 						catch (Exception)
@@ -206,31 +204,38 @@ public class WindowsMediaControls
 		cachedInfo = new PlaybackInfo();
 	}
 
-	private static async void UpdateThumbnailAsync()
+	private static async Task UpdateThumbnailAsync()
 	{
-		_ = 1;
+		await thumbnailGate.WaitAsync();
 		try
 		{
-			IRandomAccessStreamReference thumbnail = (await (currentSession?.TryGetMediaPropertiesAsync())).Thumbnail;
+			var session = currentSession;
+			if (session == null) return;
+			IRandomAccessStreamReference thumbnail = (await session.TryGetMediaPropertiesAsync()).Thumbnail;
 			if (thumbnail != null)
 			{
 				using (IRandomAccessStreamWithContentType thumbnailStream = await thumbnail.OpenReadAsync())
 				{
-					cachedInfo.thumbnail = ConvertThumbnailToSkImage(thumbnailStream);
-					if (lastThumbnail == null || !AreThumbnailsEqual(lastThumbnail, cachedInfo.thumbnail))
+					var image = ConvertThumbnailToSkImage(thumbnailStream);
+					if (session != currentSession) { image?.Dispose(); return; }
+					if (!AreThumbnailsEqual(lastThumbnail, image))
 					{
+						cachedInfo.thumbnail = image;
+						lastThumbnail = image;
 						onThumbnailUpdated?.Invoke();
 						onMediaUpdated?.Invoke();
-						lastThumbnail = cachedInfo.thumbnail;
 					}
+					else image?.Dispose();
 					return;
 				}
 			}
 			cachedInfo.thumbnail = null;
 		}
-		catch (COMException)
+		catch (Exception ex)
 		{
+			FLogger.Error("Thumbnail update failed: " + ex.GetType().Name);
 		}
+		finally { thumbnailGate.Release(); }
 	}
 
 	private static SKImage? ConvertThumbnailToSkImage(IRandomAccessStreamWithContentType thumbnailStream)
@@ -241,7 +246,7 @@ public class WindowsMediaControls
 		{
 			return null;
 		}
-		SKBitmap sKBitmap2 = sKBitmap.Resize(new SKImageInfo(512, 512), SKFilterQuality.High);
+		using SKBitmap sKBitmap2 = sKBitmap.Resize(new SKImageInfo(512, 512), SKFilterQuality.High);
 		sKBitmap.Dispose();
 		return (sKBitmap2 != null) ? SKImage.FromBitmap(sKBitmap2) : null;
 	}

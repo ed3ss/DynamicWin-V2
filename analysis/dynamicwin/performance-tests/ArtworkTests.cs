@@ -19,6 +19,17 @@ internal static class ArtworkTests
         Require(!ArtworkResolver.ValidImageUrl("file:///private/cover.jpg"), "Local artwork accepted");
         Require(!ArtworkResolver.ValidImageUrl("https://a.mzstatic.com.attacker.example/cover.jpg"), "Untrusted host accepted");
         Require(!ArtworkResolver.ValidImageUrl("http://a.mzstatic.com/cover.jpg"), "Insecure image accepted");
+        const string deezer = """
+        {"data":[{"title":"CYBERTESLA","artist":{"name":"L2B "},"album":{"title":"CYBERTESLA","cover_big":"https://cdn-images.dzcdn.net/images/cover/test/500.jpg"}}]}
+        """;
+        Require(ArtworkResolver.SelectDeezerArtwork(deezer, "CYBERTESLA", "L2B", "") != null, "Deezer match failed");
+        Require(ArtworkResolver.SelectDeezerArtwork(deezer, "CYBERTESLA", "Other", "") == null, "Wrong Deezer artist accepted");
+        Require(!ArtworkResolver.ValidImageUrl("https://cdn-images.dzcdn.net.attacker.example/a.jpg"), "Deezer host spoof accepted");
+        using (var fallbackHttp = new HttpClient(new FallbackHandler(deezer)))
+        {
+            var fallback = new ArtworkResolver(fallbackHttp);
+            Require(await fallback.ResolveAsync("CYBERTESLA", "L2B", "", CancellationToken.None) != null, "Empty Apple results did not fall back");
+        }
         var presence = DiscordActivity.Create(true, "Song", "Artist", "https://a.mzstatic.com/right.jpg")!;
         Require(presence.Assets?.LargeImageKey == "https://a.mzstatic.com/right.jpg", "Cover missing from presence");
         Require(DiscordActivity.Create(false, "Song", "Artist", "https://a.mzstatic.com/right.jpg") == null, "Cover persists after pause");
@@ -45,5 +56,11 @@ internal static class ArtworkTests
             if (request.RequestUri?.Host != "itunes.apple.com") throw new Exception("Unexpected catalogue host");
             return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(fixture, Encoding.UTF8, "application/json") });
         }
+    }
+
+    private sealed class FallbackHandler(string fixture) : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+            => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(request.RequestUri!.Host == "api.deezer.com" ? fixture : "{\"results\":[]}", Encoding.UTF8, "application/json") });
     }
 }

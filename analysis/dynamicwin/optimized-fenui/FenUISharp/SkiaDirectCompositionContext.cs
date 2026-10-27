@@ -488,55 +488,16 @@ public class SkiaDirectCompositionContext : IDisposable
 
 	public FAdditionalSurface CreateAdditional(SKImageInfo info)
 	{
-		if (_isDisposed)
-		{
-			FLogger.Error("CreateAdditional was called but devices were already disposed.");
-			return new FAdditionalSurface(SKSurface.Create(info), null, null, null, info, null);
-		}
-		if (grContext == null || !IsDeviceValid())
-		{
-			throw new InvalidOperationException("GRContext is not initialized or device is invalid.");
-		}
-		if (DirectCompositionContext?.Device == null)
-		{
-			throw new InvalidOperationException("D3D12 Device is null");
-		}
-		ResourceDescription description = new ResourceDescription
-		{
-			Dimension = ResourceDimension.Texture2D,
-			Alignment = 0uL,
-			Width = (ulong)info.Width,
-			Height = (uint)info.Height,
-			DepthOrArraySize = 1,
-			MipLevels = 1,
-			Format = Format.B8G8R8A8_UNorm,
-			SampleDescription = new SampleDescription(1u, 0u),
-			Layout = TextureLayout.Unknown,
-			Flags = ResourceFlags.AllowRenderTarget
-		};
-		ClearValue value = new ClearValue
-		{
-			Format = Format.B8G8R8A8_UNorm,
-			Color = new Color4(0f, 0f, 0f, 0f)
-		};
-		ID3D12Resource iD3D12Resource = DirectCompositionContext?.Device.CreateCommittedResource(new HeapProperties(HeapType.Default), HeapFlags.None, description, ResourceStates.RenderTarget, value);
-		GRD3DTextureResourceInfo gRD3DTextureResourceInfo = new GRD3DTextureResourceInfo();
-		if ((object)iD3D12Resource == null)
-		{
-			throw new NullReferenceException("Texture is null");
-		}
-		gRD3DTextureResourceInfo.Resource = iD3D12Resource.NativePointer;
-		gRD3DTextureResourceInfo.ResourceState = 4u;
-		gRD3DTextureResourceInfo.Format = 87u;
-		gRD3DTextureResourceInfo.SampleCount = 1u;
-		gRD3DTextureResourceInfo.LevelCount = 1u;
-		gRD3DTextureResourceInfo.SampleQualityPattern = 0u;
-		gRD3DTextureResourceInfo.Protected = false;
-		GRD3DTextureResourceInfo gRD3DTextureResourceInfo2 = gRD3DTextureResourceInfo;
-		GRBackendTexture gRBackendTexture = new GRBackendTexture(info.Width, info.Height, gRD3DTextureResourceInfo2);
-		return new FAdditionalSurface(SKSurface.Create(grContext, gRBackendTexture, GRSurfaceOrigin.TopLeft, info.ColorType), iD3D12Resource, gRD3DTextureResourceInfo2, gRBackendTexture, info, this);
+        if (_isDisposed || grContext == null || !IsDeviceValid())
+            throw new InvalidOperationException("Graphics context is unavailable.");
+        if (info.Width <= 0 || info.Height <= 0)
+            throw new ArgumentOutOfRangeException(nameof(info));
+        // Skia owns this texture and keeps it alive while snapshots reference it.
+        // Do not release an externally-owned D3D texture before its snapshots.
+        var surface = SKSurface.Create(grContext, true, info);
+        if (surface == null) throw new InvalidOperationException("Unable to create cached surface.");
+        return new FAdditionalSurface(surface, null, null, null, info, this);
 	}
-
 	public void Dispose()
 	{
 		if (_isDisposed)

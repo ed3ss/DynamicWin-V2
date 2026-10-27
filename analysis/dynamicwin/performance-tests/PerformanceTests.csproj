@@ -3,9 +3,9 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net9.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <Nullable>enable</Nullable><AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <ItemGroup>
+  <ItemGroup><Compile Include="../optimized-v2/PixelRowCopy.cs" Link="PixelRowCopy.cs" />
     <PackageReference Include="DiscordRichPresence" Version="1.6.1.70" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <Compile Include="../optimized-v2/DynamicWin/DiscordActivity.cs" Link="DiscordActivity.cs" />

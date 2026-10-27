@@ -18,7 +18,7 @@ if (System.Text.Encoding.UTF8.GetByteCount(unicode) > 120 || unicode.Contains('\
     throw new Exception("Discord UTF-8 truncation failed");
 if (DiscordActivity.Create(true, "", "")!.State != "Avec DynamicWin") throw new Exception("Discord fallback failed");
 Console.WriteLine("PASS Discord: ID validation, listening payload, serialization, pause, Unicode and fallbacks.");
-await ArtworkTests.RunAsync();
+await ArtworkTests.RunAsync(); PixelCopyTests.Run();
 
 // Compare against the original stereo algorithm, including its allocation pattern.
 static float[] Legacy(byte[] input, int samples, int rate, float[] last, Complex[]? scratch = null)

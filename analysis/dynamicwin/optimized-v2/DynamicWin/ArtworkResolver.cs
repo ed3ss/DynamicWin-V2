@@ -28,8 +28,19 @@ internal sealed class ArtworkResolver
         {
             if (cache.TryGetValue(key, out var saved) && saved.Expires > DateTime.UtcNow) return saved.Url;
             string term = Uri.EscapeDataString(artist + " " + title);
-            string json = await http.GetStringAsync("https://itunes.apple.com/search?media=music&entity=song&limit=10&term=" + term, token).ConfigureAwait(false);
-            string? result = SelectArtwork(json, title, artist, album);
+            string? result = null;
+            try
+            {
+                string json = await http.GetStringAsync("https://itunes.apple.com/search?media=music&entity=song&limit=10&term=" + term, token).ConfigureAwait(false);
+                result = SelectArtwork(json, title, artist, album);
+            }
+            catch (HttpRequestException) { }
+            catch (OperationCanceledException) when (!token.IsCancellationRequested) { }
+            if (result == null)
+            {
+                string json = await http.GetStringAsync("https://api.deezer.com/search?limit=25&q=" + Uri.EscapeDataString(title), token).ConfigureAwait(false);
+                result = SelectDeezerArtwork(json, title, artist, album);
+            }
             if (cache.Count >= 128) cache.Clear();
             cache[key] = (DateTime.UtcNow.AddMinutes(result == null ? 5 : 60), result);
             return result;
@@ -53,9 +64,27 @@ internal sealed class ArtworkResolver
         return fallback;
     }
 
+    internal static string? SelectDeezerArtwork(string json, string title, string artist, string album)
+    {
+        using var document = JsonDocument.Parse(json);
+        if (!document.RootElement.TryGetProperty("data", out var results) || results.ValueKind != JsonValueKind.Array) return null;
+        string? fallback = null;
+        foreach (var entry in results.EnumerateArray())
+        {
+            if (!entry.TryGetProperty("artist", out var author) || !entry.TryGetProperty("album", out var record)) continue;
+            if (Normalize(Value(entry, "title")) != Normalize(title) || Normalize(Value(author, "name")) != Normalize(artist)) continue;
+            string url = Value(record, "cover_big");
+            if (!ValidImageUrl(url)) continue;
+            if (!string.IsNullOrWhiteSpace(album) && Normalize(Value(record, "title")) == Normalize(album)) return url;
+            fallback ??= url;
+        }
+        return fallback;
+    }
+
     internal static bool ValidImageUrl(string? url) => url is { Length: <= 256 }
         && Uri.TryCreate(url, UriKind.Absolute, out var uri)
-        && uri.Scheme == "https" && uri.Host.EndsWith(".mzstatic.com", StringComparison.OrdinalIgnoreCase);
+        && uri.Scheme == "https" && (uri.Host.EndsWith(".mzstatic.com", StringComparison.OrdinalIgnoreCase)
+            || uri.Host.Equals("cdn-images.dzcdn.net", StringComparison.OrdinalIgnoreCase));
 
     private static string Value(JsonElement element, string key) => element.TryGetProperty(key, out var value) && value.ValueKind == JsonValueKind.String ? value.GetString() ?? "" : "";
     private static string Normalize(string value) => new(value.Normalize(NormalizationForm.FormD).Where(char.IsLetterOrDigit).Select(char.ToLowerInvariant).ToArray());

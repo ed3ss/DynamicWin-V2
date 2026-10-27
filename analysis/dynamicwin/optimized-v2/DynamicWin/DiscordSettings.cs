@@ -45,7 +45,7 @@ public class DiscordSettings : ISettingsControlGroup
             Settings.SaveAllSettings();
             Apply();
         };
-        Settings.CreateSettingControlBase(list, covers, "Afficher la pochette", "Recherche publique Apple avec le titre et l’artiste. Aucun fichier local envoyé.");
+        Settings.CreateSettingControlBase(list, covers, "Afficher la pochette", "Recherche publique Apple/Deezer avec le titre et l’artiste. Aucun fichier local envoyé.");
         Settings.CreateSettingsControlSeparator(list);
         var input = new FTextInputField(new FText(TextModelFactory.CreateBasic("")))
         {

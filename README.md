@@ -19,7 +19,7 @@ Le script télécharge la distribution officielle v2.0.3 et vérifie son SHA-256
 
 Aucun identifiant d’application Discord n’est fourni. Créez votre propre application Discord et saisissez son identifiant dans les paramètres Discord de DynamicWin. Les paramètres utilisateur restent dans `%APPDATA%/DynamicWinV2-Optimized`, hors du dépôt.
 
-Les pochettes sont recherchées sur iTunes à partir du titre et de l’artiste lorsque l’option est activée ; une correspondance n’est pas garantie.
+Les pochettes sont recherchées sur iTunes puis sur Deezer en secours à partir du titre et de l’artiste lorsque l’option est activée ; une correspondance n’est pas garantie.
 
 Google Calendar nécessite votre propre fichier OAuth client JSON, désigné par la variable d’environnement `DYNAMICWIN_GOOGLE_CREDENTIALS`. Les identifiants intégrés à la distribution originale sont exclus des sources. Ne commitez aucun fichier OAuth ni le dossier `gcalendar`.
 
@@ -28,3 +28,5 @@ Google Calendar nécessite votre propre fichier OAuth client JSON, désigné par
 DynamicWin et fenUI : Florian Butz et leurs contributeurs. Ce dépôt conserve la licence CC BY-SA 4.0 fournie avec DynamicWin (`LICENSE`), l’attribution et les notices des composants tiers. Les changements décrits ci-dessus sont propres à cette version modifiée. Les bibliothèques tierces restent soumises à leurs licences respectives.
 
 Les sources décompilées produisent encore des avertissements de nullabilité. Les microbenchmarks ne prouvent pas à eux seuls une baisse globale de consommation CPU.
+
+Les correctifs et leurs limites de validation sont décrits dans [STABILITE.md](analysis/dynamicwin/STABILITE.md).
