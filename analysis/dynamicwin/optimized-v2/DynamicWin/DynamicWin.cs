@@ -36,6 +36,7 @@ public class DynamicWin
 		LoadResources();
 		Directory.CreateDirectory(AppDataPath);
 		Settings.LoadAllSettings();
+		ComfortRuntime.Load();
 		Settings.SetSetting("run_count", Settings.GetSetting("run_count", 0) + 1);
 		SetupStartupRegKey();
 		Settings.SetListenerForSettingChange("general.launch-at-login", SetupStartupRegKey);
@@ -62,6 +63,7 @@ public class DynamicWin
 			CreateTrayIcon();
 			MainWindow.LogicDispatcher.Invoke(delegate
 			{
+				ComfortRuntime.Initialize(MainWindow);
 				RegisterableLoader.LoadAllRegisterables();
 				FContext.GetRootViewPane()?.SilentSetView(new MasterView());
 				if (Array.IndexOf(args, "--settings") >= 0) Settings.CreateSettingsWindow();

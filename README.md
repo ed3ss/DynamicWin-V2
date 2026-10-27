@@ -30,3 +30,5 @@ DynamicWin et fenUI : Florian Butz et leurs contributeurs. Ce dépôt conserve l
 Les sources décompilées produisent encore des avertissements de nullabilité. Les microbenchmarks ne prouvent pas à eux seuls une baisse globale de consommation CPU.
 
 Les correctifs et leurs limites de validation sont décrits dans [STABILITE.md](analysis/dynamicwin/STABILITE.md).
+
+Paramètres supplémentaires : [guide Confort](analysis/dynamicwin/CONFORT.md).

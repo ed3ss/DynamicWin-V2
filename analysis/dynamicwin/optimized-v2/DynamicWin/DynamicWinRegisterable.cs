@@ -51,6 +51,8 @@ public class DynamicWinRegisterable : IRegisterable
 		Settings.RegisterSettingsCategoryHeader("Other");
 		Settings.RegisterSettingsCategory(new SettingsCategory { CategoryID = "local.discordcg", Name = "Discord", Icon = Resources.GetImage("music-settings-category-icon") });
 		Settings.RegisterSettingsControl<DiscordSettings>();
+		Settings.RegisterSettingsCategory(new SettingsCategory { CategoryID = "local.comfortcg", Name = "Confort", Icon = Resources.GetImage("music-settings-category-icon") });
+		Settings.RegisterSettingsControl<ComfortSettings>();
 		DiscordSettings.Apply();
 		Settings.RegisterSettingsCategory(new SettingsCategory
 		{

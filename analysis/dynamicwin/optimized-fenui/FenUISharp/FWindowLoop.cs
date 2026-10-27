@@ -34,6 +34,7 @@ public class FWindowLoop : IDisposable
 	public bool CapFrameTime { get; set; }
 
 	public float MaxFrameTime { get; set; } = 32f;
+	public double MaxFramesPerSecond { get; set; }
 
 	public Func<bool>? _logicIsRunning { get; set; }
 
@@ -93,6 +94,7 @@ public class FWindowLoop : IDisposable
 		while (true)
 		{
 			Func<bool>? logicIsRunning = _logicIsRunning;
+			num = 1000.0 / Math.Max(1, MaxFramesPerSecond > 0 ? Math.Min(Window.TargetRefreshRate, MaxFramesPerSecond) : Window.TargetRefreshRate);
 			if (logicIsRunning == null || !logicIsRunning())
 			{
 				break;

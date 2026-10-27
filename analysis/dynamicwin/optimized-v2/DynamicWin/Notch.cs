@@ -280,7 +280,7 @@ public class Notch : UIObject
 			mousePositionBeforeDrag = FContext.GetCurrentWindow().ClientMousePosition;
 			base.Transform.Scale.SetStaticState(Vector2.One);
 		}
-		base.Transform.LocalPosition.SetStaticState(new Vector2(dragLocalXOffset, 0f), 10u);
+		base.Transform.LocalPosition.SetStaticState(new Vector2(dragLocalXOffset + (isDemoNotch ? 0 : ComfortRuntime.OffsetX), 0f), 10u);
 		ViewPane.Layout.MarginHorizontal.SetStaticState(RMath.Remap(IsBigNotch, 0f, 1f, NotchInwardCornerRadius / 2.8f, InsideMargin / MarginDivisor));
 		ViewPane.Layout.MarginVertical.SetStaticState(RMath.Remap(IsBigNotch, 0f, 1f, NotchInwardCornerRadius / 2.8f, InsideMargin / MarginDivisor));
 		if (isDemoNotch)
@@ -311,7 +311,8 @@ public class Notch : UIObject
 		float to = RMath.Lerp(NotchInwardCornerRadius, CornerRadius, IsBigNotch);
 		currentNotchInwardCornerRadius = RMath.Lerp(currentNotchInwardCornerRadius, to, FContext.DeltaTime * 10f);
 		NotchOutwardCornerRadius = currentNotchInwardCornerRadius / 4f;
-		base.Transform.LocalPosition.SetStaticState(new Vector2(base.Transform.LocalPosition.CachedValue.x, (IsNotchMode ? 0f : IslandTopOffset) + topOffset));
+		base.Transform.LocalPosition.SetStaticState(new Vector2(base.Transform.LocalPosition.CachedValue.x, (IsNotchMode ? 0f : IslandTopOffset) + topOffset + (isDemoNotch ? 0 : ComfortRuntime.OffsetY)));
+		base.ImageEffects.Opacity.SetStaticState(ComfortRuntime.Opacity);
 		topOffset = RMath.Lerp(topOffset, 0f, FContext.DeltaTime * 4f);
 		Vector2 cachedValue = base.Transform.Size.CachedValue;
 		base.Transform.Size.SetStaticState(Spring.Update(FContext.DeltaTime, CurrentSize));
@@ -371,7 +372,7 @@ public class Notch : UIObject
 		base.Render(canvas);
 		using SKPaint sKPaint = GetRenderPaint();
 		canvas.Translate(0f, -1f);
-		sKPaint.Color = SKColors.Black;
+		sKPaint.Color = ComfortRuntime.Background;
 		SKRect localBounds = base.Shape.LocalBounds;
 		localBounds.Inflate(75f, 75f);
 		localBounds.Offset(0f, 75f);

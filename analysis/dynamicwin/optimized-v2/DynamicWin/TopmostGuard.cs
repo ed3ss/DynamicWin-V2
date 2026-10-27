@@ -1,5 +1,5 @@
 using System;
-using System.Diagnostics;
+
 using System.IO;
 using System.Runtime.InteropServices;
 using FenUISharp;
@@ -12,11 +12,12 @@ internal sealed class TopmostGuard : IDisposable
     private readonly FWindow window;
     private readonly WinEventProc callback;
     private readonly Action check;
-    private readonly Stopwatch clock = Stopwatch.StartNew();
+
     private readonly IntPtr hook;
-    private long nextCheck;
-    private bool disposed;
+
+    private volatile bool disposed;
     private bool hiddenForFullscreen;
+    private readonly System.Threading.Timer watchdog;
 
     internal TopmostGuard(FWindow window)
     {
@@ -24,7 +25,7 @@ internal sealed class TopmostGuard : IDisposable
         check = Check;
         callback = (_, _, _, _, _, _, _) => Queue();
         hook = SetWinEventHook(3, 3, IntPtr.Zero, callback, 0, 0, 2); // FOREGROUND, OUTOFCONTEXT | SKIPOWNPROCESS
-        window.Callbacks.OnPreUpdate += Watchdog;
+        watchdog = new System.Threading.Timer(_ => Queue(), null, 500, 500);
         Queue();
     }
 
@@ -33,17 +34,12 @@ internal sealed class TopmostGuard : IDisposable
         if (!disposed) window.WindowDispatcher.InvokeWithID(check, "dynamicwin.topmost");
     }
 
-    private void Watchdog()
-    {
-        if (clock.ElapsedMilliseconds < nextCheck) return;
-        nextCheck = clock.ElapsedMilliseconds + 2000;
-        Queue(); // Also catches delayed promotions after an app launches.
-    }
-
     private void Check()
     {
         if (disposed) return;
-        if (ForegroundPolicy.ShouldYield())
+        bool yield = ComfortRuntime.ManualHidden || ForegroundPolicy.ShouldYield(ComfortRuntime.Exclusions, ComfortRuntime.GameMode);
+        ComfortRuntime.Tick(yield);
+        if (yield)
         {
             if (IsWindowVisible(window.hWnd))
             {
@@ -81,7 +77,7 @@ internal sealed class TopmostGuard : IDisposable
     public void Dispose()
     {
         disposed = true;
-        window.Callbacks.OnPreUpdate -= Watchdog;
+        watchdog.Dispose();
         if (hook != IntPtr.Zero) UnhookWinEvent(hook);
         GC.KeepAlive(callback);
     }

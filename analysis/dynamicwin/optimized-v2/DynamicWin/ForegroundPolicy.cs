@@ -13,7 +13,7 @@ internal static class ForegroundPolicy
         catch { return false; }
     }
 
-    internal static bool ShouldYield()
+    internal static bool ShouldYield(string[]? exclusions = null, bool protectFullscreen = true)
     {
         var hwnd = GetForegroundWindow();
         if (hwnd == IntPtr.Zero || hwnd == GetShellWindow() || hwnd == GetDesktopWindow()) return false;
@@ -22,9 +22,11 @@ internal static class ForegroundPolicy
         try
         {
             using var process = Process.GetProcessById((int)id);
-            if (process.ProcessName.StartsWith("FortniteClient", StringComparison.OrdinalIgnoreCase)) return true;
+            if (exclusions != null && ComfortOptions.IsExcluded(process.ProcessName, exclusions)) return true;
+            if (protectFullscreen && process.ProcessName.StartsWith("FortniteClient", StringComparison.OrdinalIgnoreCase)) return true;
         }
         catch { }
+        if (!protectFullscreen) return false;
         var info = new MonitorInfo { Size = Marshal.SizeOf<MonitorInfo>() };
         return GetWindowRect(hwnd, out var rect) && GetMonitorInfoW(MonitorFromWindow(hwnd, 2), ref info)
             && CoversMonitor(rect.Left, rect.Top, rect.Right, rect.Bottom, info.Monitor.Left, info.Monitor.Top, info.Monitor.Right, info.Monitor.Bottom);

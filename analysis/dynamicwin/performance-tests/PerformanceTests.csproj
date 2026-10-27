@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable><AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <ItemGroup><Compile Include="../optimized-v2/DynamicWin/ForegroundPolicy.cs" Link="ForegroundPolicy.cs" /><Compile Include="../optimized-v2/PixelRowCopy.cs" Link="PixelRowCopy.cs" />
+  <ItemGroup><Compile Include="../optimized-v2/DynamicWin/LocalDiagnostics.cs" Link="LocalDiagnostics.cs" /><Compile Include="../optimized-v2/DynamicWin/ComfortOptions.cs" Link="ComfortOptions.cs" /><Compile Include="../optimized-v2/DynamicWin/ForegroundPolicy.cs" Link="ForegroundPolicy.cs" /><Compile Include="../optimized-v2/PixelRowCopy.cs" Link="PixelRowCopy.cs" />
     <PackageReference Include="DiscordRichPresence" Version="1.6.1.70" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <Compile Include="../optimized-v2/DynamicWin/DiscordActivity.cs" Link="DiscordActivity.cs" />
@@ -15,5 +15,3 @@
     <Reference Include="NAudio.Core"><HintPath>../v2.0.3/NAudio.Core.dll</HintPath></Reference>
   </ItemGroup>
 </Project>
-
-

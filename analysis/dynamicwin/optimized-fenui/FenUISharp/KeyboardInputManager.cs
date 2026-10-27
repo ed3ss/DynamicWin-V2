@@ -75,7 +75,7 @@ public class KeyboardInputManager : IDisposable
 		case '\u0010':
 			IsShiftPressed = false;
 			break;
-		case '¤':
+		case '\u0012':
 		case '¥':
 			IsAltPressed = false;
 			break;
@@ -98,7 +98,7 @@ public class KeyboardInputManager : IDisposable
 		case '\u0010':
 			IsShiftPressed = true;
 			break;
-		case '¤':
+		case '\u0012':
 		case '¥':
 			IsAltPressed = true;
 			break;

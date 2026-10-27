@@ -119,3 +119,9 @@ if (!ForegroundPolicy.CoversMonitor(-1920, 0, 0, 1080, -1920, 0, 0, 1080)) throw
 if (ForegroundPolicy.CoversMonitor(0, 0, 1920, 1040, 0, 0, 1920, 1080)) throw new Exception("Maximized window misclassified");
 if (ForegroundPolicy.CoversMonitor(100, 100, 1600, 900, 0, 0, 1920, 1080)) throw new Exception("Windowed app misclassified");
 Console.WriteLine("PASS foreground policy: fullscreen, secondary monitor, maximized and windowed apps.");
+var excluded = ComfortOptions.ParseExclusions(" FortniteClient-Win64-Shipping.exe; OBS.exe; obs; ../private; ; ");
+if (excluded.Length != 2 || !ComfortOptions.IsExcluded("OBS", excluded) || ComfortOptions.IsExcluded("obs64", excluded)) throw new Exception("Exclusion normalization or exact match failed");
+if (ComfortOptions.FrameRate(true, true, false) != 15 || ComfortOptions.FrameRate(true, true, true) != 60 || ComfortOptions.FrameRate(false, true, false) != 60) throw new Exception("Economy policy failed");
+if (!ComfortOptions.ValidColor("#fF0099") || ComfortOptions.ValidColor("#XYZXYZ") || ComfortOptions.ValidColor("112233")) throw new Exception("Color validation failed");
+Console.WriteLine("PASS comfort: exclusion normalization/exact matching, economy policies and color validation.");
+DiagnosticTests.Run();

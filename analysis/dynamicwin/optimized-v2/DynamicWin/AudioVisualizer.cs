@@ -66,6 +66,7 @@ public class AudioVisualizer : IDisposable
 
 	private void OnDataAvailable(object sender, WaveInEventArgs e)
 	{
+		if (ComfortRuntime.Suspended) return;
 		if (e.BytesRecorded < _capture.WaveFormat.BlockAlign) return;
 		this.DataAvailable?.Invoke(this, processor.Process(e.Buffer, e.BytesRecorded, _capture.WaveFormat.Channels));
 	}
@@ -85,4 +86,3 @@ public class AudioVisualizer : IDisposable
 		this.DataAvailable = null;
 	}
 }
-
