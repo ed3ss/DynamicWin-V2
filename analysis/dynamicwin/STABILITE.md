@@ -14,3 +14,9 @@ Corrections apportées :
 Validation : compilation des copies locale et publique, 180 comparaisons audio, tests Discord/pochettes et 15 cas de copie mémoire avec marges de garde intactes. La version relancée a fonctionné plusieurs minutes et Discord a confirmé la présence avec pochette. Aucun test court ne garantit l’absence de tout crash ; les diagnostics Windows restent utiles en cas de récidive.
 
 Les dumps et journaux contenant des chemins locaux restent hors du dépôt.
+
+## Protection du focus en jeu
+
+Quick Drop ne démarre que pour un geste commencé dans l’Explorateur Windows ; sa fenêtre de détection ne demande plus le focus. L’overlay se masque pendant que Fortnite est au premier plan (y compris en fenêtre), ou qu’une autre fenêtre couvre son moniteur, puis se restaure avec SW_SHOWNA. La préférence « toujours au premier plan » est conservée.
+
+Validation : compilation des deux distributions, tests de géométrie plein écran/écran secondaire/fenêtre maximisée/fenêtre normale, et suite de tests existante. Le comportement en partie réelle reste à confirmer.

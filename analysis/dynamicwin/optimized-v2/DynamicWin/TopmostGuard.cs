@@ -16,6 +16,7 @@ internal sealed class TopmostGuard : IDisposable
     private readonly IntPtr hook;
     private long nextCheck;
     private bool disposed;
+    private bool hiddenForFullscreen;
 
     internal TopmostGuard(FWindow window)
     {
@@ -41,7 +42,22 @@ internal sealed class TopmostGuard : IDisposable
 
     private void Check()
     {
-        if (disposed || !window.Properties.AlwaysOnTop || !IsWindowVisible(window.hWnd)) return;
+        if (disposed) return;
+        if (ForegroundPolicy.ShouldYield())
+        {
+            if (IsWindowVisible(window.hWnd))
+            {
+                hiddenForFullscreen = true;
+                ShowWindow(window.hWnd, 0); // Hide; never activate or compete with a game.
+            }
+            return;
+        }
+        if (hiddenForFullscreen)
+        {
+            hiddenForFullscreen = false;
+            ShowWindow(window.hWnd, 8); // SW_SHOWNA: restore without activation.
+        }
+        if (!window.Properties.AlwaysOnTop || !IsWindowVisible(window.hWnd)) return;
         IntPtr foreground = GetForegroundWindow();
         GetWindowThreadProcessId(foreground, out uint process);
         if (process == Environment.ProcessId) return; // Keep our settings window usable.
@@ -78,5 +94,6 @@ internal sealed class TopmostGuard : IDisposable
     [DllImport("user32.dll")] private static extern IntPtr GetWindow(IntPtr hwnd, uint command);
     [DllImport("user32.dll")] private static extern IntPtr GetWindowLongPtrW(IntPtr hwnd, int index);
     [DllImport("user32.dll")] private static extern bool IsWindowVisible(IntPtr hwnd);
+    [DllImport("user32.dll")] private static extern bool ShowWindow(IntPtr hwnd, int command);
     [DllImport("user32.dll")] private static extern bool SetWindowPos(IntPtr hwnd, IntPtr after, int x, int y, int w, int h, uint flags);
 }

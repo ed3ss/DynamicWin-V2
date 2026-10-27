@@ -113,3 +113,9 @@ static object MeasureWait(bool optimized)
     return new { elapsedMs = time.Elapsed.TotalMilliseconds, cpuMs = (process.TotalProcessorTime - cpu).TotalMilliseconds };
 }
 Console.WriteLine(JsonSerializer.Serialize(new { spectrumComparisons = cases, legacyAllocatedBytesPerPacket = legacyBytes, allocatedBytesPerPacket = optimizedBytes, oldFinalFrameWait = MeasureWait(false), newFinalFrameWait = MeasureWait(true) }, new JsonSerializerOptions { WriteIndented = true }));
+
+
+if (!ForegroundPolicy.CoversMonitor(-1920, 0, 0, 1080, -1920, 0, 0, 1080)) throw new Exception("Fullscreen secondary monitor missed");
+if (ForegroundPolicy.CoversMonitor(0, 0, 1920, 1040, 0, 0, 1920, 1080)) throw new Exception("Maximized window misclassified");
+if (ForegroundPolicy.CoversMonitor(100, 100, 1600, 900, 0, 0, 1920, 1080)) throw new Exception("Windowed app misclassified");
+Console.WriteLine("PASS foreground policy: fullscreen, secondary monitor, maximized and windowed apps.");

@@ -38,6 +38,7 @@ public class FWindowProperties : IDisposable
 	}
 
 	public bool HideWindowOnClose { get; set; }
+	public bool ShowWithoutActivation { get; set; }
 
 	public bool IsWindowVisible
 	{
@@ -47,7 +48,7 @@ public class FWindowProperties : IDisposable
 		}
 		set
 		{
-			ShowWindow(value ? ShowWindowCommand.SW_SHOW : ShowWindowCommand.SW_HIDE);
+			ShowWindow(value ? (Window is FOverlayWindow || ShowWithoutActivation ? (ShowWindowCommand)8 : ShowWindowCommand.SW_SHOW) : ShowWindowCommand.SW_HIDE);
 		}
 	}
 
@@ -322,3 +323,4 @@ public class FWindowProperties : IDisposable
 		_hiddenOwnerWindowHandle = IntPtr.Zero;
 	}
 }
+
